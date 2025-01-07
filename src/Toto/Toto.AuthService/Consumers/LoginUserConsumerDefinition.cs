@@ -1,17 +1,14 @@
-using Toto.AuthService.Consumers;
+using MassTransit;
 
-namespace Company.Consumers
+namespace Toto.AuthService.Consumers;
+
+public class LoginUserConsumerDefinition :
+    ConsumerDefinition<LoginUserConsumer>
 {
-    using MassTransit;
-
-    public class LoginUserConsumerDefinition :
-        ConsumerDefinition<LoginUserConsumer>
+    protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<LoginUserConsumer> consumerConfigurator, IRegistrationContext context)
     {
-        protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<LoginUserConsumer> consumerConfigurator, IRegistrationContext context)
-        {
-            endpointConfigurator.UseMessageRetry(r => r.Intervals(500, 1000));
+        endpointConfigurator.UseMessageRetry(r => r.Intervals(500, 1000));
 
-            endpointConfigurator.UseInMemoryOutbox(context);
-        }
+        endpointConfigurator.UseInMemoryOutbox(context);
     }
 }

@@ -2,7 +2,6 @@ using MassTransit;
 using Toto.AuthService.Consumers.Converters;
 using Toto.AuthService.Domain.Interfaces;
 using Toto.Contracts;
-using Toto.Extensions;
 using Toto.Extensions.DI;
 
 namespace Toto.AuthService.Consumers;

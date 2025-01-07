@@ -22,7 +22,12 @@ namespace Toto.AuthService
     {
         public static async Task Main(string[] args)
         {
-            await CreateHostBuilder(args).Build().RunAsync();
+            var host = CreateHostBuilder(args).Build();
+            
+            var applyMigration = Environment.GetEnvironmentVariable("MIGRATION_KEY") == "initOrUpdateDb";
+            host.Migrate<AuthDbContext>(applyMigration);
+            
+            await host.RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
