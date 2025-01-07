@@ -4,6 +4,7 @@ using Toto.ApiGateway.Models;
 using Toto.ApiGateway.Models.Converters;
 using Toto.Contracts;
 using Toto.Extensions;
+using Toto.Extensions.DI;
 
 namespace Toto.ApiGateway.Controllers;
 
@@ -16,9 +17,10 @@ public class AuthController(IRequestClient<LoginUser> loginUserRequestClient) : 
     [HttpPost("login/{authProvider}")]
     public async Task<IActionResult> Login([FromRoute] AuthProviderDto authProvider, [FromQuery] string code)
     {
+        var provider = authProvider.ToContract();
         var tokens = await _loginUserRequestClient.GetResponse<LoginUserResult>(new
         {
-            Provider = authProvider.ToContract(),
+            AuthProvider = provider,
             Code = code
         });
         

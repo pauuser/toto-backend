@@ -1,12 +1,33 @@
 version: "3.6"
 
+volumes:
+  rabbitmq-volume:
+  postgresql-volume:
+
 services:
   rabbitmq:
     image: masstransit/rabbitmq:latest
     ports:
-     - "5672:5672"
-     - "15672:15672"
-     - "15692:15692"
+      - "5672:5672"
+      - "15672:15672"
+      - "15692:15692"
+    volumes:
+      - rabbitmq-volume:/var/lib/rabbitmq
+  
+  postgres:
+    container_name: postgres_container
+    image: postgres:16.3
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /data/postgres
+      POSTGRES_DB: Users
+    ports:
+      - "5432:5432"
+    volumes:
+       - postgresql-volume:/data/postgres
+    restart: always
+  
   worker:
     build:
       context: .

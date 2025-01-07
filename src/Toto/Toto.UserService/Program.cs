@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
 using MassTransit;
+using Toto.Extensions.DI;
+using Toto.Extensions.PostgreSQL;
+using Toto.UserService.DataAccess.Context;
+using Toto.UserService.DataAccess.Repositories;
+using Toto.UserService.Domain.Interfaces;
 
 namespace Toto.UserService
 {
@@ -12,13 +12,26 @@ namespace Toto.UserService
     {
         public static async Task Main(string[] args)
         {
-            await CreateHostBuilder(args).Build().RunAsync();
+            var host = CreateHostBuilder(args).Build();
+            
+            var applyMigration = Environment.GetEnvironmentVariable("MIGRATION_KEY") == "initOrUpdateDb";
+            host.Migrate<UserDbContext>(applyMigration);
+            
+            await host.RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
+                    var connectionString = hostContext.Configuration.GetConnectionString("DefaultConnection");
+                    services.ConnectToDatabase<UserDbContext>(connectionString);
+
+                    services.AddTransient<IUserRepository, UserRepository>();
+                    services.AddTransient<IUserService, Application.UserService>();
+                    
+                    services.AddValidatedOption<QueryTimeLogOptions>(QueryTimeLogOptions.ConfigurationSectionName);
+                    
                     services.AddMassTransit(x =>
                     {
                         x.SetKebabCaseEndpointNameFormatter();

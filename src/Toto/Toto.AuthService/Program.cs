@@ -2,9 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using MassTransit;
+using Toto.AuthService.Application;
+using Toto.AuthService.DataAccess.Context;
+using Toto.AuthService.DataAccess.Repositories;
+using Toto.AuthService.Domain.Configuration;
+using Toto.AuthService.Domain.Interfaces;
+using Toto.AuthService.Services;
+using Toto.Extensions.DI;
+using Toto.Extensions.PostgreSQL;
 
 namespace Toto.AuthService
 {
@@ -19,6 +29,17 @@ namespace Toto.AuthService
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
+                    var connectionString = hostContext.Configuration.GetConnectionString("DefaultConnection");
+                    services.ConnectToDatabase<AuthDbContext>(connectionString);
+
+                    services.AddTransient<ITokenRepository, TokenRepository>();
+                    
+                    services.AddValidatedOption<JwtTokenConfiguration>(JwtTokenConfiguration.ConfigurationSectionName);
+                    services.AddValidatedOption<QueryTimeLogOptions>(QueryTimeLogOptions.ConfigurationSectionName);
+                    
+                    services.AddTransient<ILoginService, LoginService>();
+                    services.AddTransient<ITokenService, TokenService>();
+                    
                     services.AddMassTransit(x =>
                     {
                         x.SetKebabCaseEndpointNameFormatter();
