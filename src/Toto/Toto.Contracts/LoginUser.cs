@@ -2,14 +2,14 @@ using Toto.Contracts.Models;
 
 namespace Toto.Contracts;
 
-public record LoginUser
+public sealed class LoginUser
 {
     public string Code { get; init; }
     
     public AuthProviderContractDto AuthProvider { get; init; }
 }
 
-public record LoginUserResult
+public sealed class LoginUserResult : RequestResult
 {
     public string AccessToken { get; init; }
     

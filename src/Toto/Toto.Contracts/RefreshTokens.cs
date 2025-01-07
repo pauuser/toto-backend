@@ -1,11 +1,11 @@
 namespace Toto.Contracts;
 
-public record RefreshTokens
+public sealed class RefreshTokens
 {
     public string RefreshToken { get; init; }
 }
 
-public record RefreshTokenResult
+public sealed class RefreshTokenResult : RequestResult
 {
     public string AccessToken { get; init; }
     

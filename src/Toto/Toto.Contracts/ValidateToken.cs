@@ -1,11 +1,11 @@
 namespace Toto.Contracts;
 
-public record ValidateToken
+public sealed class ValidateToken
 {
     public string AccessToken { get; init; }
 }
 
-public record ValidateTokenResult
+public sealed class ValidateTokenResult : RequestResult
 {
     public Guid UserId { get; set; }
 }

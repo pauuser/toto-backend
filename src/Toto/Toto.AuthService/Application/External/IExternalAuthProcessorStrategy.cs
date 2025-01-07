@@ -8,5 +8,5 @@ public interface IExternalAuthProcessorStrategy
 {
     AuthProvider Provider { get; }
     
-    Task<UserData> Authenticate(string code);
+    Task<UserData> AuthenticateAsync(string code);
 }

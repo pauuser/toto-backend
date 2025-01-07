@@ -8,7 +8,7 @@ public class AppleAuthProcessorStrategy : IExternalAuthProcessorStrategy
 {
     public AuthProvider Provider => AuthProvider.Apple;
     
-    public async Task<UserData> Authenticate(string code)
+    public async Task<UserData> AuthenticateAsync(string code)
     {
         return new UserData
         {

@@ -1,6 +1,6 @@
 namespace Toto.Contracts;
 
-public record LogoutUser
+public sealed class LogoutUser
 {
     public string AccessToken { get; init; }
 }

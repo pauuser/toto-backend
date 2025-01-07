@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Toto.AuthService.Domain.Configuration;
+using Toto.AuthService.Domain.Exceptions;
 using Toto.AuthService.Domain.Interfaces;
 using Toto.AuthService.Domain.Models;
 using Toto.AuthService.Services.Helpers;
@@ -41,31 +42,39 @@ public class TokenService(IOptions<JwtTokenConfiguration> jwtTokenConfiguration)
 
     public async Task<UserClaims> ValidateTokenAndExtractClaimsAsync(string accessToken)
     {
-        var keyBytes = Encoding.UTF8.GetBytes(_jwtTokenConfiguration.Key);
-        var issuerSigningKey = new SymmetricSecurityKey(keyBytes);
-
-        var tokenValidationParameters = new TokenValidationParameters
+        try
         {
-            ValidateIssuer = true,
-            ValidIssuer = _jwtTokenConfiguration.Issuer,
-            ValidateAudience = true,
-            ValidAudience = _jwtTokenConfiguration.Audience,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = issuerSigningKey,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromSeconds(_jwtTokenConfiguration.ClockSkewSeconds)
-        };
+            var keyBytes = Encoding.UTF8.GetBytes(_jwtTokenConfiguration.Key);
+            var issuerSigningKey = new SymmetricSecurityKey(keyBytes);
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        accessToken = accessToken.Replace("Bearer ", string.Empty);
-        var validationResult =
-            await tokenHandler.ValidateTokenAsync(token: accessToken, validationParameters: tokenValidationParameters);
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = _jwtTokenConfiguration.Issuer,
+                ValidateAudience = true,
+                ValidAudience = _jwtTokenConfiguration.Audience,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = issuerSigningKey,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.FromSeconds(_jwtTokenConfiguration.ClockSkewSeconds)
+            };
 
-        if (!validationResult.IsValid)
-            throw validationResult.Exception;
+            var tokenHandler = new JwtSecurityTokenHandler();
+            accessToken = accessToken.Replace("Bearer ", string.Empty);
+            var validationResult =
+                await tokenHandler.ValidateTokenAsync(token: accessToken,
+                    validationParameters: tokenValidationParameters);
 
-        var jwtToken = (JwtSecurityToken)validationResult.SecurityToken;
+            if (!validationResult.IsValid)
+                throw validationResult.Exception;
 
-        return JwtTokenParser.ParseTokenClaims(jwtToken);
+            var jwtToken = (JwtSecurityToken)validationResult.SecurityToken;
+
+            return JwtTokenParser.ParseTokenClaims(jwtToken);
+        }
+        catch (Exception e)
+        {
+            throw new InvalidTokenException("Invalid token", e);
+        }
     }
 }

@@ -1,6 +1,6 @@
 namespace Toto.Contracts;
 
-public record GetUserByEmail
+public sealed class GetUserByEmail
 {
     public string Email { get; init; }
     
@@ -9,7 +9,7 @@ public record GetUserByEmail
     public string? LastName { get; init; }
 }
 
-public record GetUserByEmailResult
+public sealed class GetUserByEmailResult : RequestResult
 {
     public Guid Id { get; init; }
     

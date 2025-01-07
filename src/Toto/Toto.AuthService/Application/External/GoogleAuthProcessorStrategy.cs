@@ -8,7 +8,7 @@ public class GoogleAuthProcessorStrategy : IExternalAuthProcessorStrategy
 {
     public AuthProvider Provider => AuthProvider.Google;
 
-    public async Task<UserData> Authenticate(string code)
+    public async Task<UserData> AuthenticateAsync(string code)
     {
         return new UserData
         {
